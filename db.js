@@ -18,8 +18,14 @@ const exercise = new mongoose.Schema({
         type: String,
         required: true
     },
-    description: String,
-    duration: Number,
+    description: {
+        type: String,
+        required: true
+    },
+    duration: {
+        type: Number,
+        required: true
+    },
     date: {
         type: Date,
         required: true

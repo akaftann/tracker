@@ -31,6 +31,22 @@ app.post('/api/users',async (req,res)=>{
   res.json({username: user.username, _id: user._id})
 })
 
+app.post('/api/users/:_id/exercises',async (req,res)=>{
+  const {_id, description, duration} = req.body
+  const date = req.body.date || new Date()
+  const user = User.findById({_id})
+  const exerciseNew = new Exercise({
+    _id,
+    username: user.username,
+    description,
+    duration,
+    date
+  })
+  const exercise = await exerciseNew.save()
+  res.json(exercise)
+
+})
+
 
 
 
