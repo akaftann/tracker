@@ -19,9 +19,11 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
 
-app.post('/api/users',(req,res)=>{
-  console.log(req.body)
-  res.json('some result')
+app.post('/api/users',async (req,res)=>{
+  const {username} = req.body
+  const userNew = new User({username})
+  const user = await userNew.save()
+  res.json({username: user.username, _id: user._id})
 })
 
 
