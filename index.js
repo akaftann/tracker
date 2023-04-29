@@ -6,6 +6,7 @@ import {User,
   Exercise,
   Log,
   connectDb} from './db.js'
+import { clear } from 'console'
 
 const app = express()
 dotenv.config()
@@ -32,9 +33,10 @@ app.post('/api/users',async (req,res)=>{
 })
 
 app.post('/api/users/:_id/exercises',async (req,res)=>{
-  const {_id, description, duration} = req.body
+  const { description, duration} = req.body
   const date = req.body.date || new Date()
-  const user = User.findById({_id})
+  const _id = req.params._id
+  const user = await User.findById(_id)
   const exerciseNew = new Exercise({
     _id,
     username: user.username,
@@ -44,7 +46,6 @@ app.post('/api/users/:_id/exercises',async (req,res)=>{
   })
   const exercise = await exerciseNew.save()
   res.json(exercise)
-
 })
 
 
