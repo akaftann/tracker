@@ -45,7 +45,13 @@ app.post('/api/users/:_id/exercises',async (req,res)=>{
     date
   })
   const exercise = await exerciseNew.save()
-  res.json(exercise)
+  res.json({
+    _id: exercise._id,
+    username: exercise.username,
+    date: exercise.date.toDateString(),
+    duration: parseInt(exercise.duration),
+    description: exercise.description
+  })
 })
 
 
