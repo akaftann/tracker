@@ -34,8 +34,12 @@ app.post('/api/users',async (req,res)=>{
 
 app.post('/api/users/:_id/exercises',async (req,res)=>{
   const { description, duration} = req.body
-  let date = req.body.date || new Date()
-  date = date.toDateString()
+  let date = req.body.date
+  if(date){
+    date = new Date(date).toDateString()
+  }else{
+    date = new Date().toDateString()
+  }
   const _id = req.params._id
   const user = await User.findById(_id)
   const exercise = await Exercise.findOneAndUpdate({_id: _id},{
