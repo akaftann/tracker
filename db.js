@@ -27,7 +27,7 @@ const exercise = new mongoose.Schema({
         required: true
     },
     date: {
-        type: Date,
+        type: String,
         required: true
     }
 })
@@ -52,7 +52,7 @@ const log = new mongoose.Schema({
         type: [{
             description: String,
             duration: Number,
-            date: Date
+            date: String
         }],
         required: true
     }
