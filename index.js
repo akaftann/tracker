@@ -85,7 +85,7 @@ app.post('/api/users/:_id/exercises',async (req,res)=>{
 app.get('/api/users/:_id/logs', async (req,res)=>{
   const _id = req.params._id
   let {from, to, limit} = req.query
-  console.log(`query: ${req.query} and params: ${req.params}`)
+  console.log(from, to, limit, _id)
   let logs
   if(from && to && limit){
     from = new Date(from)
