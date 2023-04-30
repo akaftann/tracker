@@ -84,7 +84,28 @@ app.post('/api/users/:_id/exercises',async (req,res)=>{
 
 app.get('/api/users/:_id/logs', async (req,res)=>{
   const _id = req.params._id
-  const logs = await Log.findById(_id)
+  let {from, to, limit} = req.query
+  let logs
+  if(from && to && limit){
+    from = new Date(from)
+    to = new Date(to)
+    logs = await Log.aggregate([
+      {$match: {_id: _id}},
+      {$unwind: "$log"},
+      {$match:{"log.date":{$gte:from, $lte:to}}},
+      {$limit: parseInt(limit)},
+      {
+        $group: {
+          _id: "$_id",
+          username: { $first: "$username" },
+          count: { $first: "$count" },
+          log: { $push: "$log" },
+        },
+      }
+    ])
+  }
+  console.log(from)
+  logs = await Log.findById(_id)
   res.json(logs)
 })
 
