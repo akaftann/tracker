@@ -103,10 +103,11 @@ app.get('/api/users/:_id/logs', async (req,res)=>{
         },
       }
     ])
+  }else{
+    logs = await Log.findById(_id)
   }
-  console.log(from)
-  logs = await Log.findById(_id)
   res.json(logs)
+  
 })
 
 
