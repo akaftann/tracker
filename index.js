@@ -104,7 +104,39 @@ app.get('/api/users/:_id/logs', async (req,res)=>{
         },
       }
     ])
-  }else{
+  }else if (from && to && !limit){
+    from = new Date(from)
+    to = new Date(to)
+    logs = await Log.aggregate([
+      {$match: {_id: _id}},
+      {$unwind: "$log"},
+      {$match:{"log.date":{$gte:from, $lte:to}}},
+      {
+        $group: {
+          _id: "$_id",
+          username: { $first: "$username" },
+          count: { $first: "$count" },
+          log: { $push: "$log" },
+        },
+      }
+    ])
+  }
+  else if(!from && !to && limit){
+    logs = await Log.aggregate([
+      {$match: {_id: _id}},
+      {$unwind: "$log"},
+      {$limit: parseInt(limit)},
+      {
+        $group: {
+          _id: "$_id",
+          username: { $first: "$username" },
+          count: { $first: "$count" },
+          log: { $push: "$log" },
+        },
+      }
+    ])
+  }
+  else{
     logs = await Log.findById(_id)
   }
   res.json(logs)
