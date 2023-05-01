@@ -110,7 +110,21 @@ app.get('/api/users/:_id/logs', async (req,res)=>{
       }
     })
   }
-  res.json(logs)
+  let updLog= logs.log.map((el)=>{
+    let res = {
+      description: el.description,
+      duration: el.duration,
+      date: el.date.toDateString()
+    }
+    return res
+  })
+  let result = {
+    _id: logs._id,
+    username: logs.username,
+    count: logs.count,
+    log: updLog
+  }
+  res.json(result)
   
 })
 
