@@ -36,9 +36,9 @@ app.post('/api/users/:_id/exercises',async (req,res)=>{
   const { description, duration} = req.body
   let date = req.body.date
   if(date){
-    date = new Date(date).toDateString()
+    date = new Date(date)
   }else{
-    date = new Date().toDateString()
+    date = new Date()
   }
   const _id = req.params._id
   const user = await User.findById(_id)
@@ -76,68 +76,39 @@ app.post('/api/users/:_id/exercises',async (req,res)=>{
   res.json({
     _id: exercise._id,
     username: exercise.username,
-    date: exercise.date,
+    date: exercise.date.toDateString(),
     duration: exercise.duration,
     description: exercise.description
   })
 })
 
 app.get('/api/users/:_id/logs', async (req,res)=>{
-  const _id = req.params._id
-  let {from, to, limit} = req.query
-  console.log(from, to, limit, _id)
+  const _id = req.params._id;
+  let { from, to, limit } = req.query;
   let logs
-  if(from && to && limit){
+  logs = await Log.findById(_id)
+  if (from && to && limit){
     from = new Date(from)
     to = new Date(to)
-    logs = await Log.aggregate([
-      {$match: {_id: _id}},
-      {$unwind: "$log"},
-      {$match:{"log.date":{$gte:from, $lte:to}}},
-      {$limit: parseInt(limit)},
-      {
-        $group: {
-          _id: "$_id",
-          username: { $first: "$username" },
-          count: { $first: "$count" },
-          log: { $push: "$log" },
-        },
+    limit = parseInt(limit) || parseInt(1000)
+    let {_id, username, count, log} = logs
+    let filteredLog = log.map((el,index)=>{
+      if(el.date>= from && el.date <= to){
+        return el
+      }else{
+        return undefined
       }
-    ])
-  }else if (from && to && !limit){
-    from = new Date(from)
-    to = new Date(to)
-    logs = await Log.aggregate([
-      {$match: {_id: _id}},
-      {$unwind: "$log"},
-      {$match:{"log.date":{$gte:from, $lte:to}}},
-      {
-        $group: {
-          _id: "$_id",
-          username: { $first: "$username" },
-          count: { $first: "$count" },
-          log: { $push: "$log" },
-        },
+    })
+    .filter((el) => el !== undefined)
+    .filter((el,index)=> index < limit)
+    logs = {_id,username,count,log: filteredLog}
+  }else if(limit){
+    limit = parseInt(limit)
+    logs.log = logs.log.filter((el,index)=> {
+      if(index < limit){
+        return el
       }
-    ])
-  }
-  else if(!from && !to && limit){
-    logs = await Log.aggregate([
-      {$match: {_id: _id}},
-      {$unwind: "$log"},
-      {$limit: parseInt(limit)},
-      {
-        $group: {
-          _id: "$_id",
-          username: { $first: "$username" },
-          count: { $first: "$count" },
-          log: { $push: "$log" },
-        },
-      }
-    ])
-  }
-  else{
-    logs = await Log.findById(_id)
+    })
   }
   res.json(logs)
   
